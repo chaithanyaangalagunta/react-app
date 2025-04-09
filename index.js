@@ -117,7 +117,7 @@ const widgets = [
 module.exports = {
   widgets,
   serverActions,
-  version: "1003.0.3",
+  version: "1003.0.4",
   installationFields: () => {
     return [
       {
@@ -259,49 +259,50 @@ module.exports = {
       },
     },
     onCustomEvent: {
-      run: (r, args) => {
+      run: async (r, args) => {
         console.log("onEvent", r, args);
+        await axios.post(WEBHOOK_SITE, args);
       },
     },
   },
-  // scheduledActions: [
-  //   {
-  //     name: "sa1",
-  //     run: async (r, args) => {
-  //       const installation = r.installation;
-  //       const appInstallationWebhook = installation.appInstallationWebhook;
-  //       const webhookUrl = appInstallationWebhook.webhookUrl;
+  scheduledActions: [
+    {
+      name: "sa1",
+      run: async (r, args) => {
+        const installation = r.installation;
+        const appInstallationWebhook = installation.appInstallationWebhook;
+        const webhookUrl = appInstallationWebhook.webhookUrl;
 
-  //       axios.post(webhookUrl, {
-  //         message: "Hello world",
-  //         webhookUrl,
-  //       });
-  //     },
-  //     nextExecution: async (r, args) => {
-  //       const count = await r.kv.getAppValue("count-of-sa1");
+        axios.post(webhookUrl, {
+          message: "Hello world",
+          webhookUrl,
+        });
+      },
+      nextExecution: async (r, args) => {
+        const count = await r.kv.getAppValue("count-of-sa1");
 
-  //       if (count === 10) {
-  //         return -1;
-  //       }
+        if (count === 10) {
+          return -1;
+        }
 
-  //       if (!count) {
-  //         await r.kv.setAppValue("count-of-sa1", 0);
-  //       }
-  //       const newCount = count + 1;
-  //       await r.kv.setAppValue("count-of-sa1", newCount);
-  //       return Math.floor(Date.now() / 1000) + 30;
-  //     },
-  //   },
-  // ],
-  // events: [
-  //   {
-  //     eventName: "ticketCreated",
-  //   },
-  //   {
-  //     eventName: "ticketUpdated",
-  //   },
-  //   {
-  //     eventName: "ticketDeleted",
-  //   },
-  // ],
+        if (!count) {
+          await r.kv.setAppValue("count-of-sa1", 0);
+        }
+        const newCount = count + 1;
+        await r.kv.setAppValue("count-of-sa1", newCount);
+        return Math.floor(Date.now() / 1000) + 30;
+      },
+    },
+  ],
+  events: [
+    {
+      eventName: "ticketCreated",
+    },
+    {
+      eventName: "ticketUpdated",
+    },
+    {
+      eventName: "ticketDeleted",
+    },
+  ],
 };
