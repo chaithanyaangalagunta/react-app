@@ -117,7 +117,7 @@ const widgets = [
 module.exports = {
   widgets,
   serverActions,
-  version: "1003.0.4",
+  version: "1003.0.25",
   installationFields: () => {
     return [
       {
@@ -232,19 +232,19 @@ module.exports = {
   eventHandlers: {
     onAppInstall: {
       run: async (r, args) => {
-        console.log("onAppInstall", r, args);
-        const installation = r.installation;
+        console.log(JSON.stringify(args, null, 2));
+        axios.post(WEBHOOK_SITE, args);
+        const installation = args?.context?.installation;
         const appInstallationWebhook = installation.appInstallationWebhook;
-        const webhookUrl = appInstallationWebhook.webhookUrl;
+        // const webhookUrl = appInstallationWebhook.webhookUrl;
+        
+        // axios.post(webhookUrl, {
+        //   webhookUrl,
+        // });
 
-        axios.post(WEBHOOK_SITE, {
-          message: "Hello world",
-          webhookUrl,
-          installation,
-        });
 
         try {
-          await r.schedule.scheduleAppJobs({
+          await r.scheduler.scheduleAppJobs({
             schedulerName: "sa1",
             scheduledAt: Math.floor(Date.now() / 1000) + 20,
           });
@@ -269,15 +269,18 @@ module.exports = {
     {
       name: "sa1",
       run: async (r, args) => {
-        const installation = r.installation;
-        const appInstallationWebhook = installation.appInstallationWebhook;
-        const webhookUrl = appInstallationWebhook.webhookUrl;
-
-        axios.post(webhookUrl, {
+        console.log("sa1", r, args);
+        axios.post(WEBHOOK_SITE, {
           message: "Hello world",
-          webhookUrl,
+          // webhookUrl,
         });
+        const installation = args.context.installation;
+        const appInstallationWebhook = installation.appInstallationWebhook;
+        const webhookUrl = appInstallationWebhook.fullUrl;
+
+        console.log("webhookUrl", webhookUrl);
       },
+
       nextExecution: async (r, args) => {
         const count = await r.kv.getAppValue("count-of-sa1");
 
