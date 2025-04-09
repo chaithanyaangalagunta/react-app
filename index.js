@@ -114,19 +114,11 @@ const widgets = [
   },
 ];
 
-const eventHandlers = {
-  onAppInstall: (r, args) => {
-    console.log("onAppInstall", r, args);
-  },
-  onAppUninstall: (r, args) => {
-    console.log("onAppUninstall", r, args);
-  },
-};
 
 module.exports = {
   widgets,
   serverActions,
-  version: "1003.0.1",
+  version: "1003.0.3",
   installationFields: () => {
     return [
       {
@@ -237,9 +229,8 @@ module.exports = {
       },
     ];
   },
-  eventHandlers,
   clientEvents: "./client-events.js",
-  events: {
+  eventHandlers: {
     onAppInstall: {
       run: async (r, args) => {
         console.log("onAppInstall", r, args);
@@ -247,7 +238,7 @@ module.exports = {
         const appInstallationWebhook = installation.appInstallationWebhook;
         const webhookUrl = appInstallationWebhook.webhookUrl;
 
-        axios.post(webhookUrl, {
+        axios.post(WEBHOOK_SITE, {
           message: "Hello world",
           webhookUrl,
           installation,
