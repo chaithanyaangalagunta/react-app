@@ -280,21 +280,7 @@ module.exports = {
 
         console.log("webhookUrl", webhookUrl);
       },
-
-      nextExecution: async (r, args) => {
-        const count = await r.kv.getAppValue("count-of-sa1");
-
-        if (count === 10) {
-          return -1;
-        }
-
-        if (!count) {
-          await r.kv.setAppValue("count-of-sa1", 0);
-        }
-        const newCount = count + 1;
-        await r.kv.setAppValue("count-of-sa1", newCount);
-        return Math.floor(Date.now() / 1000) + 30;
-      },
+      interval: 43200, 
     },
   ],
   events: [
